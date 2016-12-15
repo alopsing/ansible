@@ -1,0 +1,26 @@
+--- # Playbook Translation
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: date/time when the playbook starts
+    command: /usr/bin/date
+    register: timestamp_start
+  - debug: var=timestamp_start
+  - name: Install the Apache Web Server
+    yum: pkg=httpd state=latest
+    notify: start HTTPD
+  - name: Verify that web service is running
+    command: systemctl status httpd
+    register: result
+  - degub: var=result
+  - name: Log all the packages installed on the system
+    command: yum list installed
+    register=installed_result
+  - debug: var=installed_result
+  - name: date/time when the playbook ends
+    command: /usr/bin/date
+    register: timestand_end
+  - debug: var=timestamp_end
+  handlers:
+  - name: start HTTPD
+    service: name=httpd state=restarted
